@@ -3,10 +3,11 @@ using System.Collections.Generic;
 namespace Steering {
 	public class Car {
 		private float maxSpeed = 255.0f; // Matches PWM
-		private float acceleration = 40.0f; // Arbitrairy acceleration
+		private float acceleration = 30.0f; // Arbitrairy acceleration
 
 		private Love.Body body = null;
 		private Love.PolygonShape shape = null;
+		private Love.PolygonShape directionTriangle = null;
 		private Love.Fixture fixture = null;
 
 		public Tire frontLeft = null;
@@ -85,18 +86,33 @@ namespace Steering {
 		public void Draw() {
 			var points = this.shape.GetPoints();
 
-			var newPoints = new Love.Vector2[points.Length];
+			var bodyPoints = new Love.Vector2[points.Length];
 
 			for (var i = 0; i < points.Length; i++) {
-				newPoints[i] = this.body.GetWorldPoint(points[i]);
+				bodyPoints[i] = this.body.GetWorldPoint(points[i]);
 			}
-
-			Love.Graphics.Polygon(Love.DrawMode.Fill, newPoints);
+			
+			Love.Graphics.Polygon(Love.DrawMode.Fill, bodyPoints);
+			
 
 			this.frontLeft.Draw();
 			this.frontRight.Draw();
 			this.backLeft.Draw();
 			this.backRight.Draw();
+
+			Love.Graphics.Push(Love.StackType.All);
+			Love.Graphics.SetColor(1.0f, 0.0f, 0.0f, 1.0f);
+			var pos = this.body.GetPosition();
+			var angle = this.body.GetAngle() + 0.5f;
+			Love.Graphics.Translate(pos.X, pos.Y);
+			Love.Graphics.Rotate(angle);
+			Love.Graphics.Circle(Love.DrawMode.Fill, 0.0f, 0.0f, 1.0f, 3);
+			Love.Graphics.SetColor(1.0f, 1.0f, 1.0f, 1.0f);
+			Love.Graphics.Pop();
+		}
+
+		public void SetPosition(Love.Vector2 pos) {
+			this.body.SetPosition(pos.X, pos.Y);
 		}
 	}
 }
